@@ -7,7 +7,7 @@
 -- these lines here.
 
 -- Table for player (id, name)
-CREATE TABLE Players(
+CREATE TABLE players(
 	playerID serial primary key,
 	name varchar(200)
 );
@@ -15,49 +15,49 @@ CREATE TABLE Players(
 -- Table for matches between players (id, winner, losser, date)
 -- Date is not needed, but is a good way to keep track 
 -- of the rounds, or when the matche was recorded.
-CREATE TABLE Matches(
+CREATE TABLE matches(
 	matchID serial primary key,
-	winnerID serial references Players (playerID),
-	loserID serial references Players (playerID),
+	winnerID serial references players (playerID),
+	loserID serial references players (playerID),
 	date timestamp default current_timestamp
 );
 
 -- View to simplify access to results (id, name, wins, matches)
-CREATE VIEW PlayersStatistics AS
+CREATE VIEW players_statistics AS
 	SELECT
-		Players.playerID AS id,
-		Players.name AS name,
+		players.playerID AS id,
+		players.name AS name,
 		Wins.wonGames AS wins,
 		SUM( Wins.wonGames + Defeats.lostGames ) AS matches
 	FROM
-		Players,
+		players,
 		(
 			SELECT 
-				Players.playerID,
-				COALESCE(COUNT(Matches.loserID), 0) AS lostGames
+				players.playerID,
+				COALESCE(COUNT(matches.loserID), 0) AS lostGames
 			FROM 
-				Players
-				LEFT OUTER JOIN Matches ON Matches.loserID = Players.playerID 
+				players
+				LEFT OUTER JOIN matches ON matches.loserID = players.playerID 
 			GROUP BY 
-				Players.playerID
+				players.playerID
 		) AS Defeats,
 		(
 			SELECT 
-				Players.playerID,
-				COALESCE(COUNT(Matches.winnerID), 0) AS wonGames
+				players.playerID,
+				COALESCE(COUNT(matches.winnerID), 0) AS wonGames
 			FROM 
-				Players
-				LEFT OUTER JOIN Matches ON Matches.winnerID = Players.playerID 
+				players
+				LEFT OUTER JOIN matches ON matches.winnerID = players.playerID 
 			GROUP BY 
-				Players.playerID
+				players.playerID
 		) AS Wins
 	WHERE 
-		Wins.playerID = Players.playerID 
+		Wins.playerID = players.playerID 
 		AND
-		Defeats.playerID = Players.playerID
+		Defeats.playerID = players.playerID
 	GROUP BY 
-		Players.playerID,
-		Players.name,
+		players.playerID,
+		players.name,
 		Wins.wonGames,
 		Defeats.lostGames
 	ORDER BY
@@ -65,10 +65,10 @@ CREATE VIEW PlayersStatistics AS
 	;
 
 -- Add some data for testing
-INSERT INTO Players (name) VALUES ('Markov Chaney'), ('Joe Malik'), ('Mao Tsu-hsi'), ('Atlanta Hope');
-INSERT INTO Matches (winnerID, loserID) VALUES (1, 2), (1, 3), (1, 4), (2, 3), (2, 4), (3, 4);
+INSERT INTO players (name) VALUES ('Markov Chaney'), ('Joe Malik'), ('Mao Tsu-hsi'), ('Atlanta Hope');
+INSERT INTO matches (winnerID, loserID) VALUES (1, 2), (1, 3), (1, 4), (2, 3), (2, 4), (3, 4);
 
 -- Some output for visual validation
-SELECT * FROM Players;
-SELECT * FROM Matches;
-SELECT * FROM PlayersStatistics;
+SELECT * FROM players;
+SELECT * FROM matches;
+SELECT * FROM players_statistics;

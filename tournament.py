@@ -6,13 +6,15 @@
 import psycopg2
 
 
-def connect():
+def connect(databaseName="tournament"):
     """Connect to the PostgreSQL database.  Returns a database connection and cursor."""
-    
-    conn = psycopg2.connect("dbname=tournament")
-    cur = conn.cursor()
+    try:
+    	conn = psycopg2.connect("dbname={}".format(databaseName))
+    	cur = conn.cursor()
 
-    return conn, cur
+    	return conn, cur
+    except:
+    	print("Error: Connection failed")
 
 
 def closeConnection(conn, cur):
@@ -26,7 +28,7 @@ def deleteMatches():
     """Remove all the match records from the database."""
     
     conn, cur = connect()
-    cur.execute("DELETE FROM Matches;")
+    cur.execute("DELETE FROM matches;")
     conn.commit()
     closeConnection(conn, cur)
 
@@ -35,7 +37,7 @@ def deletePlayers():
     """Remove all the player records from the database."""
 
     conn, cur = connect()
-    cur.execute("DELETE FROM Players;")
+    cur.execute("DELETE FROM players;")
     conn.commit()
     closeConnection(conn, cur)
 
@@ -44,7 +46,7 @@ def countPlayers():
     """Returns the number of players currently registered."""
 
     conn, cur = connect()
-    cur.execute("SELECT COUNT(PlayerID) FROM Players;")
+    cur.execute("SELECT COUNT(playerID) FROM players;")
     numberPlayers = cur.fetchone()[0]
     closeConnection(conn, cur)
 
@@ -62,7 +64,7 @@ def registerPlayer(name):
     """
 
     conn, cur = connect()
-    cur.execute("INSERT INTO Players (Name) VALUES (%s)", (name,))
+    cur.execute("INSERT INTO players (name) VALUES (%s)", (name,))
     conn.commit()
     closeConnection(conn, cur)
 
@@ -82,7 +84,7 @@ def playerStandings():
     """
 
     conn, cur = connect()
-    cur.execute("SELECT * FROM PlayersStatistics;")
+    cur.execute("SELECT * FROM players_statistics;")
     playerStats = cur.fetchall()
     closeConnection(conn, cur)
 
@@ -98,7 +100,7 @@ def reportMatch(winner, loser):
     """
 
     conn, cur = connect()
-    cur.execute("INSERT INTO Matches (winnerID, loserID) VALUES (%s,%s)", (winner, loser,))
+    cur.execute("INSERT INTO matches (winnerID, loserID) VALUES (%s,%s)", (winner, loser,))
     conn.commit()
     closeConnection(conn, cur)
 
