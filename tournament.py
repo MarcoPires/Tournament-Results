@@ -136,17 +136,18 @@ def swissPairings():
     pairings = []
 
     # Run the standings list by twos (matching pairs)
-    for i in xrange(0, length, 2):
-        # Get current player
-        player = i
-        # Get current player pair
-        pair = i+1
-        # Save the pairs, with id and name (pair1Id, pair1Name, pair2Id, pair2Name)
-        pairings.append( 
-                [ 
-                    standings[player][getId], standings[player][getName], 
-                    standings[pair][getId], standings[pair][getName] 
-                ] 
-            )
+    if length % 2 == 0 and length > 2:
+        for i in xrange(0, length, 2):
+            # Get current player
+            player = i
+            # Get current player pair
+            pair = i+1
+            # Save the pairs, with id and name (pair1Id, pair1Name, pair2Id, pair2Name)
+            pairings.append( 
+                    [ 
+                        standings[player][getId], standings[player][getName], 
+                        standings[pair][getId], standings[pair][getName] 
+                    ] 
+                )
 
     return pairings
